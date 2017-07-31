@@ -1,5 +1,6 @@
 namespace "JDBCDemo"."db";
 
+@OData.publish: true
 context store {
 
     entity Book {

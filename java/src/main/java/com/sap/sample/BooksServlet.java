@@ -119,8 +119,7 @@ public class BooksServlet extends HttpServlet {
 		}
 	}
 	
-private JSONArray convert( ResultSet rs )
-    throws SQLException, JSONException
+private JSONArray convert(ResultSet rs) throws SQLException, JSONException
   {
     JSONArray json = new JSONArray();
     ResultSetMetaData rsmd = rs.getMetaData();

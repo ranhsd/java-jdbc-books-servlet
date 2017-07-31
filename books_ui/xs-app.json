@@ -1,0 +1,18 @@
+{
+  "welcomeFile": "/books_ui/index.html",
+  "authenticationMethod": "none",
+  "logout": {
+    "logoutEndpoint": "/do/logout"
+  },
+  "routes": [
+    {
+      "source": "^/books_ui/(.*)$",
+      "target": "$1",
+      "localDir": "webapp"
+    }, 
+    {
+    	"source" : "/odata/",
+    	"destination" : "service_be"
+    }
+  ]
+}

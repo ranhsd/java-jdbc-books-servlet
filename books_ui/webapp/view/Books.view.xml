@@ -1,0 +1,40 @@
+<mvc:View xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core"
+	controllerName="com.sap.sample.books_ui.controller.Books" displayBlock="true">
+	<App>
+		<pages>
+			<Page title="{i18n>title}">
+				<content>
+					<Table id="booksTable" inset="false" items="{ path: '/Book' }">
+						<headerToolbar>
+							<Toolbar>
+								<Title text="List of Books" level="H2"/>
+							</Toolbar>
+						</headerToolbar>
+						<columns>
+							<Column>
+								<Text text="Book"/>
+							</Column>
+							<Column minScreenWidth="Tablet" demandPopin="true">
+								<Text text="Author Name"/>
+							</Column>
+							<Column>
+								<Text text="Price"/>
+							</Column>
+						</columns>
+						<items>
+							<ColumnListItem>
+								<cells>
+									<ObjectIdentifier title="{bookName}" text="{isbn}"/>
+									<Text text="{authorName}"/>
+									<ObjectNumber
+										number="{ parts:[{path:'price'},{path:'priceCurrency'}], type: 'sap.ui.model.type.Currency', formatOptions: {showMeasure: false} }"
+										unit="{priceCurrency}"/>
+								</cells>
+							</ColumnListItem>
+						</items>
+					</Table>
+				</content>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>

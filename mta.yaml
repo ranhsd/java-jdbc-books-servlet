@@ -23,6 +23,36 @@ modules:
          JBP_CONFIG_RESOURCE_CONFIGURATION: '[tomcat/webapps/ROOT/META-INF/context.xml:
             {"service_name_for_DefaultDB" : "~{hdi-container-name}"}]'
 
+
+ - name: service
+   type: java
+   path: service
+   provides:
+    - name: service_api
+      properties:
+         url: ${default-url}
+   requires:
+    - name: hdi-container
+      properties:
+         JBP_CONFIG_RESOURCE_CONFIGURATION: '[tomcat/webapps/ROOT/META-INF/context.xml:
+            {"service_name_for_DefaultDB" : "~{hdi-container-name}"}]'
+
+
+ - name: books_ui
+   type: html5
+   path: books_ui
+   requires:
+      - name: service_api
+        group: destinations
+        properties:
+          name: service_be
+          url: '~{url}'   
+   parameters:
+      disk_quota: 256M
+      memory: 256M
+   build-parameters:
+      builder: grunt
+
 resources:
  - name: hdi-container
    properties:
