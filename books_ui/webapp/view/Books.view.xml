@@ -1,15 +1,9 @@
-<mvc:View xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core"
-	controllerName="com.sap.sample.books_ui.controller.Books" displayBlock="true">
+<mvc:View xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core" controllerName="com.sap.sample.books_ui.controller.Books" displayBlock="true">
 	<App>
 		<pages>
 			<Page title="{i18n>title}">
 				<content>
-					<Table id="booksTable" inset="false" items="{ path: '/Book' }">
-						<headerToolbar>
-							<Toolbar>
-								<Title text="List of Books" level="H2"/>
-							</Toolbar>
-						</headerToolbar>
+					<Table id="booksTable" inset="false" items="{ path: '/Book' }" width="auto">
 						<columns>
 							<Column>
 								<Text text="Book"/>
@@ -26,12 +20,24 @@
 								<cells>
 									<ObjectIdentifier title="{bookName}" text="{isbn}"/>
 									<Text text="{authorName}"/>
-									<ObjectNumber
-										number="{ parts:[{path:'price'},{path:'priceCurrency'}], type: 'sap.ui.model.type.Currency', formatOptions: {showMeasure: false} }"
-										unit="{priceCurrency}"/>
+									<ObjectNumber number="{ parts:[{path:'price'},{path:'priceCurrency'}], type: 'sap.ui.model.type.Currency', formatOptions: {showMeasure: false} }" unit="{priceCurrency}"/>
 								</cells>
 							</ColumnListItem>
 						</items>
+					<headerToolbar>
+					    <Toolbar width="100%" id="__toolbar3">
+					        <content>
+					            <Bar id="__bar1">
+					                <contentRight>
+					                    <Button width="auto" id="addBookButton" icon="sap-icon://add" text="Add Book" type="Emphasized" press="onAddBook"/>
+					                </contentRight>
+					            <contentLeft>
+					                <Title text="Books" width="100%" id="__title1"/>
+					            </contentLeft>
+					            </Bar>
+					        </content>
+					    </Toolbar>
+					</headerToolbar>
 					</Table>
 				</content>
 			</Page>

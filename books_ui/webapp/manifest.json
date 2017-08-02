@@ -78,7 +78,7 @@
 				"dataSource": "default",
 				"settings": {
 					"synchronizationMode": "None",
-					"updateGroupId": "myAppUpdateGroup"
+					"groupId" : "$direct"
 				}
 			}
 		},
