@@ -3,11 +3,15 @@ package com.company.JDBCDemo.service.extensiontemplate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.Entity;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.deserializer.DeserializerResult;
+import org.apache.olingo.server.api.uri.UriInfo;
+import org.apache.olingo.server.api.uri.UriParameter;
+import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
