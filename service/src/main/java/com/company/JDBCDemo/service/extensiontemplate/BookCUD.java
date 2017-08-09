@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.olingo.commons.api.data.Entity;
+import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.deserializer.DeserializerResult;
 import org.apache.olingo.server.api.uri.UriInfo;
@@ -95,6 +96,74 @@ public class BookCUD {
 		}
 	}
 	
+	@ExtendDataProvider(entitySet = { "Book" }, requestTypes = RequestType.UPDATE)
+	public void updateCustomer(ExtensionContext ecx) throws ODataApplicationException {
+		
+		int price;
+		
+		int bookId = 0;
+		// Obtain the DB connection
+		Connection conn = ((CDSDSParams) ecx.getDSParams()).getConnection();
+
+		PreparedStatement ps = null;
+		DataProviderExtensionContext extCtx = ecx.asDataProviderContext();
+		// Get the request payload
+		DeserializerResult payload = extCtx.getDeserializerResult();
+
+		// Obtain the URI Info to get key predicates for Update operation
+		UriInfo uri = extCtx.getUriInfo();
+		UriResourceEntitySet eset = (UriResourceEntitySet) uri.getUriResourceParts().get(0);
+		// Obtain the key values
+		List<UriParameter> keys = eset.getKeyPredicates();
+
+		Entity ent = payload.getEntity();
+		
+		price = (Integer) ent.getProperty("price").getValue();
+
+		//  For update operation, the key values will be taken from URI, not from the payload
+		for (UriParameter key : keys) {
+			if (key.getName().equals("bookId")) {
+				bookId = Integer.parseInt(key.getText());
+			}
+		}
+		
+		// Create SQL Statement for prepareStatement
+		String sql = "UPDATE \"JDBCDemo.db::store.Book\" SET \"price\"=?, WHERE " + "\"bookId\"=?";
+		try {
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, price);
+			ps.setInt(2, bookId);
+			int i = ps.executeUpdate();
+
+			// If i==0, no rows were affected. This means there was no entity.
+			// So throw 404 'Entity Not Found' exception
+			if (i == 0) {
+				throw new ODataApplicationException("Entity Not Found!", 404, Locale.US);
+			}
+
+			extCtx.setEntityToBeRead();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new ODataApplicationException("Some error occurred while updating Book", 400, Locale.US);
+		} catch (Exception e) {
+			// Handling generic exceptions
+			e.printStackTrace();
+			throw new ODataApplicationException(
+					"Some unknown error occurred while updating Book.Please contact admin", 500, Locale.US);
+		} finally {
+			// Releasing all resources
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					logr.error("!!Some problem occurred while closing the DB connection");
+					e.printStackTrace();
+				}
+			}
+		}
+	} // End of updateCustomer method
+	
 	@ExtendDataProvider(entitySet = { "Book" }, requestTypes = RequestType.DELETE)
 	public void deleteCustomer(ExtensionContext ectx) throws ODataApplicationException {
 		// Get DB connection
@@ -147,5 +216,5 @@ public class BookCUD {
 			}
 		}
 
-	} // End of method 	
+	} 
 }
