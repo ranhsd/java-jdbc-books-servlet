@@ -20,40 +20,49 @@ import com.sap.gateway.v4.rt.cds.api.CDSDSParams;
 
 public class BookCUD {
 	
-	final static Logger logr = LoggerFactory.getLogger("CustomerCUDExt");
+	final static Logger logr = LoggerFactory.getLogger("BookCUD");
 
 	@ExtendDataProvider(entitySet = { "Book" }, requestTypes = RequestType.CREATE)
 	public void createBook(ExtensionContext ecx) throws ODataApplicationException, ExtensionException {
+		
+		// get database connection
 		Connection conn = ((CDSDSParams) ecx.getDSParams()).getConnection();
 		PreparedStatement ps = null;
 
 		DataProviderExtensionContext extCtx = ecx.asDataProviderContext();
 
+		// deserialize request payload
 		DeserializerResult payload = extCtx.getDeserializerResult();
-		// Get the entity
+		
+		// Extract the entity from the request payload
 		Entity ent = payload.getEntity();
 
-		// Get the value of other properties
+		// Get the properties values 
 		int price = (Integer) ent.getProperty("price").getValue();
 		String authorName = (String) ent.getProperty("authorName").getValue();
 		String bookName = (String) ent.getProperty("bookName").getValue();
 		String isbn = (String) ent.getProperty("isbn").getValue();
 		String priceCurrency = (String) ent.getProperty("priceCurrency").getValue();
-
+		int bookId = (Integer) ent.getProperty("bookId").getValue();
+		
+		// query SQL staetement 
 		String psSQL = "INSERT INTO \"JDBCDemo.db::store.Book\" VALUES (?,?,?,?,?,?)";
 
 		try {
+			// prepare SQL statement and map entity values
 			ps = conn.prepareStatement(psSQL);
-
-			ps.setString(1, "001212");
+			ps.setInt(1, bookId);
 			ps.setString(2, bookName);
 			ps.setString(3, isbn);
 			ps.setInt(4, price);
 			ps.setString(5, priceCurrency);
 			ps.setString(6, authorName);
 			
-			extCtx.setEntityToBeRead();
-
+			// Database commit - will create a new entry 
+			ps.executeUpdate();
+			
+			extCtx.setEntityToBeRead();			
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 
@@ -63,13 +72,13 @@ public class BookCUD {
 			if (e.getLocalizedMessage().contains("unique constraint violated")) {
 				throw new ODataApplicationException("Duplicate Resource", 400, Locale.US);
 			} else {
-				throw new ODataApplicationException("Some error occurred while creating customer", 400, Locale.US);
+				throw new ODataApplicationException("Some error occurred while creating Book", 400, Locale.US);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			// Handling other generic exceptions
 			throw new ODataApplicationException(
-					"Some unknown error occurred while creating Customer.Please contact admin", 500, Locale.US);
+					"Some unknown error occurred while creating Book.Please contact admin", 500, Locale.US);
 		} finally {
 			if (conn != null) {
 				try {
@@ -81,4 +90,58 @@ public class BookCUD {
 			}		
 		}
 	}
+	
+	@ExtendDataProvider(entitySet = { "Book" }, requestTypes = RequestType.DELETE)
+	public void deleteCustomer(ExtensionContext ectx) throws ODataApplicationException {
+		// Get DB connection
+		Connection conn = ((CDSDSParams) ectx.getDSParams()).getConnection();
+		int bookId = 0;
+		PreparedStatement ps = null;
+		DataProviderExtensionContext extCtx = ectx.asDataProviderContext();
+
+		// Get URI info to obtain key predicates. No payload for delete
+		UriInfo uri = extCtx.getUriInfo();
+		UriResourceEntitySet entSet = (UriResourceEntitySet) uri.getUriResourceParts().get(0);
+		List<UriParameter> keys = entSet.getKeyPredicates();
+		
+		for (UriParameter key : keys) {
+			if (key.getName().equals("bookId")) {
+				bookId = Integer.parseInt(key.getText());
+			}
+		}
+		// Prepare the SQL statement for prepareStatement
+		String sql = "DELETE FROM \"JDBCDemo.db::store.Book\" WHERE \"bookId\"=?";
+		try {
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, bookId);
+			
+			int i = ps.executeUpdate();
+			//  If i==0, no rows were affected. This means there was no entity.
+			//  So throw 404 'Entity Not Found' exception
+			if (i == 0) {
+				throw new ODataApplicationException("Entity not found!", 404, Locale.US);
+			}
+
+		} catch (SQLException e) {
+			// Handle other SQL Exceptions
+			e.printStackTrace();
+			throw new ODataApplicationException("An error occurred while deleting Book.", 400, Locale.US);
+		} catch (Exception e) {
+			//Handling for other generic exceptions
+			e.printStackTrace();
+			throw new ODataApplicationException(
+					"Some unknown error occurred while deleting Book.Please contact admin.", 500, Locale.US);
+		} finally {
+			// release all resources
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					logr.error("Some problem occurred while closing the DB connection!");
+					e.printStackTrace();
+				}
+			}
+		}
+
+	} // End of method 	
 }
