@@ -75,7 +75,7 @@ public class BookCUD {
 			// the error message thrown by HANA DB for unique constraint
 			// violation
 			if (e.getLocalizedMessage().contains("unique constraint violated")) {
-				throw new ODataApplicationException("Duplicate Resource", 400, Locale.US);
+				throw new ODataApplicationException("Duplicate Resource - Book with the same ID already exist", 400, Locale.US);
 			} else {
 				throw new ODataApplicationException("Some error occurred while creating Book", 400, Locale.US);
 			}
@@ -99,10 +99,9 @@ public class BookCUD {
 	@ExtendDataProvider(entitySet = { "Book" }, requestTypes = RequestType.UPDATE)
 	public void updateCustomer(ExtensionContext ecx) throws ODataApplicationException {
 		
-		int price;
-		
 		int bookId = 0;
-		// Obtain the DB connection
+		
+		// Get DB connection
 		Connection conn = ((CDSDSParams) ecx.getDSParams()).getConnection();
 
 		PreparedStatement ps = null;
@@ -118,7 +117,7 @@ public class BookCUD {
 
 		Entity ent = payload.getEntity();
 		
-		price = (Integer) ent.getProperty("price").getValue();
+		int price = (Integer) ent.getProperty("price").getValue();
 
 		//  For update operation, the key values will be taken from URI, not from the payload
 		for (UriParameter key : keys) {
@@ -127,8 +126,10 @@ public class BookCUD {
 			}
 		}
 		
-		// Create SQL Statement for prepareStatement
-		String sql = "UPDATE \"JDBCDemo.db::store.Book\" SET \"price\"=?, WHERE " + "\"bookId\"=?";
+		// Create SQL Statement for updating the entry
+		// Only the book price can be updated since it is not make sense to update the other book properties
+		// e.g. name, isbn and all other
+		String sql = "UPDATE \"JDBCDemo.db::store.Book\" SET \"price\"=? WHERE " + "\"bookId\"=?";
 		try {
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, price);
@@ -140,7 +141,7 @@ public class BookCUD {
 			if (i == 0) {
 				throw new ODataApplicationException("Entity Not Found!", 404, Locale.US);
 			}
-
+			
 			extCtx.setEntityToBeRead();
 
 		} catch (SQLException e) {
@@ -188,6 +189,7 @@ public class BookCUD {
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, bookId);
 			
+			// commit changes to the DB
 			int i = ps.executeUpdate();
 			//  If i==0, no rows were affected. This means there was no entity.
 			//  So throw 404 'Entity Not Found' exception

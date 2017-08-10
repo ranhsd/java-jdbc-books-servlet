@@ -5,7 +5,7 @@
     	"path" : "/odata",
     	"target" : {
     		"type" : "destination",
-    		"name" : "books_odata_v4",
+    		"name" : "books_odata",
     		"entryPath" : "/"
     	},
     	"description" : "odata v4 service"

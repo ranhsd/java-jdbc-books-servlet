@@ -4,14 +4,15 @@
 			<Button text="Cancel" press="onDialogCancel"/>
 		</beginButton>
 		<endButton>
-			<Button text="Create" type="Emphasized" press="onDialogCreate"/>
+			<Button text="Create" type="Emphasized" press="onDialogCreate" enabled="{/canCreate}"/>
 		</endButton>
 		<content>
-			
 			<VBox>
-				<Input placeholder="Book Name" />
+				<Input type="Text" placeholder="Book Name" value="{/bookName}" change="onDialogInputChange"/>
+				<Input type="Text" placeholder="ISBN" value="{/isbn}" change="onDialogInputChange"/>
+				<Input type="Text" placeholder="Author Name" value="{/authorName}" change="onDialogInputChange"/>
+				<Input type="Number" placeholder="Price" value="{/price}" change="onDialogInputChange"/>
 			</VBox>
-			
 		</content>
 	</Dialog>
 </core:FragmentDefinition>

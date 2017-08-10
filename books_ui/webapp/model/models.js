@@ -10,6 +10,18 @@ sap.ui.define([
 			var oModel = new JSONModel(Device);
 			oModel.setDefaultBindingMode("OneWay");
 			return oModel;
+		},
+		
+		createNewBookDialogEmptyModel: function() {
+			var oDialogModel = new JSONModel({
+				"bookName" : ""	,
+				"isbn" : "",
+				"price" : "",
+				"authorName" : "",
+				"canCreate" : false
+			});
+			
+			return oDialogModel;
 		}
 
 	};
