@@ -17,6 +17,8 @@ sap.ui.define([
 			this._addBookDialog = sap.ui.xmlfragment("com.sap.sample.books_ui.view.NewBook", this);
 			// set empty JSON model 
 			this._addBookDialog.setModel(models.createNewBookDialogEmptyModel());
+			// set placeholders model
+			this._addBookDialog.setModel(models.createNewNookPlaceholdersModel(), 'PL');
 			this.getView().addDependent(this._addBookDialog);
 			return this._addBookDialog;
 		},
@@ -27,19 +29,14 @@ sap.ui.define([
 			var oView = this.getView();
 			var self = this;
 			var oBinding = this.getView().byId("booksTable").getBinding("items");
-			var iRandomBookId = parseInt(utils.generateRandomNumber(100, 9999));
 			var oDialogModel = this._getDialogModel();
-			var oContext = oBinding.create({
-				"bookId": iRandomBookId,
-				"bookName": oDialogModel.getProperty("/bookName"),
-				"authorName": oDialogModel.getProperty("/authorName"),
-				"isbn": oDialogModel.getProperty("/isbn"),
-				"price": parseInt(oDialogModel.getProperty("/price")),
-				"priceCurrency": utils.getDefaultCurrencyCode()
-			});
+
+			// make sure price is an integer field 			
+			oDialogModel.setProperty("/data/price", parseInt(oDialogModel.getProperty("/data/price")));
+			var oContext = oBinding.create(oDialogModel.oData.data);
+
 			oContext.created().then(function() {
 				// refresh binding in order to allow the creation of additional entities
-				oBinding.refresh();
 				self._addBookDialog.close();
 				utils.showInfoMessage(utils.getDefaultResourceBundle().getText("newBookCreatedInfoMessage"));
 			});
@@ -49,14 +46,18 @@ sap.ui.define([
 			}
 			// lock UI 
 			this._addBookDialog.setBusy(true);
-			oView.getModel().submitBatch(oView.getModel().getUpdateGroupId()).then(resetBusy, resetBusy);
+			oView.getModel().submitBatch("myAppUpdateGroup").then(resetBusy, resetBusy);
 		},
+
 		onDialogInputChange: function() {
 			var oDialogModel = this._getDialogModel();
-			var canCreate = oDialogModel.getProperty("/bookName").length > 0 && oDialogModel.getProperty("/authorName").length > 0 &&
-				oDialogModel.getProperty("/isbn").length > 0 && oDialogModel.getProperty("/price").length > 0;
+			var canCreate = oDialogModel.getProperty("/data/bookName").length > 0 &&
+				oDialogModel.getProperty("/data/authorName").length > 0 &&
+				oDialogModel.getProperty("/data/isbn").length > 0 &&
+				oDialogModel.getProperty("/data/price").length > 0;
 			oDialogModel.setProperty("/canCreate", canCreate);
 		},
+
 		_getDialogModel: function() {
 			return this._addBookDialog.getModel();
 		},
@@ -64,10 +65,10 @@ sap.ui.define([
 		 *@memberOf com.sap.sample.books_ui.controller.Books
 		 */
 		onDeleteBook: function(oEvent) {
-			debugger;
-			if (oEvent) {
-				
-			}
+			var oItemContext = oEvent.oSource.getBindingContext();
+			oItemContext.delete("$auto").then(function() {
+				utils.showInfoMessage(utils.getDefaultResourceBundle().getText("bookDeletedMessage"));
+			});
 		}
 	});
 });

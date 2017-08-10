@@ -8,10 +8,10 @@
 		</endButton>
 		<content>
 			<VBox>
-				<Input type="Text" placeholder="Book Name" value="{/bookName}" change="onDialogInputChange"/>
-				<Input type="Text" placeholder="ISBN" value="{/isbn}" change="onDialogInputChange"/>
-				<Input type="Text" placeholder="Author Name" value="{/authorName}" change="onDialogInputChange"/>
-				<Input type="Number" placeholder="Price" value="{/price}" change="onDialogInputChange"/>
+				<Input type="Text" placeholder="{PL>/bookNamePL}" value="{/data/bookName}" change="onDialogInputChange"/>
+				<Input type="Text" placeholder="{PL>/isbnPL}" value="{/data/isbn}" change="onDialogInputChange"/>
+				<Input type="Text" placeholder="{PL>/authorNamePL}" value="{/data/authorName}" change="onDialogInputChange"/>
+				<Input type="Number" placeholder="{PL>/pricePL}" value="{/data/price}" change="onDialogInputChange"/>
 			</VBox>
 		</content>
 	</Dialog>
